@@ -1,0 +1,113 @@
+<canvas id="canvas"></canvas>
+
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        background: #333;
+    }
+</style>
+<script>
+
+var c = document.getElementById("canvas");
+var ctx = c.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function randomColor(){
+    return '#'+(Math.random()*0xFFFFFF<<0).toString(16)
+}
+
+
+circles     = 10
+csize       = 50
+minspeed    = 5
+maxspeed    = 25
+cspeed      = 50
+wall_hits   = 0
+
+class Canvas{
+    constructor(cx, cy, cs, cspeed, color){
+        this.cx = cx
+        this.cy = cy
+        this.color = randomColor()
+        this.csize = getRandomArbitrary(30, 60)
+        this.cspeed = getRandomArbitrary(5, 25)
+        this.x = 1 * getRandomArbitrary(5, 25)
+        this.y = 1 * getRandomArbitrary(5, 25)
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.arc(this.cx, this.cy, this.csize, 0, 2 * Math.PI);
+        ctx.fillStyle = this.color;
+        ctx.fill()
+        ctx.stroke();
+        ctx.closePath()
+        
+        ctx.beginPath();
+        ctx.fillStyle = "white";
+        ctx.fill()
+        ctx.font = "30px Arial"
+        ctx.fillText(`Circle hit the wall ${wall_hits} times`,10,50)
+        ctx.closePath()
+
+        ctx.beginPath();
+        ctx.fillStyle = "white";
+        ctx.fill()
+        ctx.font = "30px Arial"
+        ctx.closePath()
+    }
+    update(){
+        this.draw()
+
+        if((this.cx + this.csize) > innerWidth){
+            this.x = -this.x
+            // this.color = randomColor()
+            wall_hits += 1 
+        }
+        if(this.cy > (innerHeight - this.csize)){
+            this.y = -this.y
+            // this.color = randomColor()
+            wall_hits += 1 
+        }
+        if((this.cx - this.csize) < 0){
+            this.x = -this.x
+            // this.color = randomColor()
+            wall_hits += 1 
+        }
+        if((this.cy - this.csize) < 0){
+            this.y = -this.y
+            // this.color = randomColor()
+            wall_hits += 1 
+        }
+
+        this.cx += this.x 
+        this.cy += this.y
+    }
+}
+
+circleArray = []
+for(let i = 0; i < circles; i++){
+    cx = getRandomArbitrary(csize, innerWidth - csize)
+    cy = getRandomArbitrary(csize, innerHeight - csize)
+    circleArray.push(new Canvas(cx, cy, csize, cspeed, "#333"))
+}
+
+
+function loop(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(let i = 0; i < circleArray.length; i++){
+        circleArray[i].update(circleArray[i])
+    }
+    requestAnimationFrame(loop)
+}
+
+loop()
+
+</script>
